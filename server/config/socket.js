@@ -38,14 +38,17 @@ io.on('connection', function(socket) {
       if (msg.room == "pi-client" && msg.type == "chat message") {
         const contentToSend = parseInt(msg.data.split("")[1]) - 1;
         var shouldGivePredefinedInput = false;
+        var shouldGivePredefinedInputArgs = false;
         var hasArgs = false;
         var isArg = false;
         for (var i = 0; i < savedInputs.length; i++) {
           if (msg.data.charAt(0) == "-") {
+            shouldGivePredefinedInputArgs = true;
+          } else if(msg.data.charAt(0) == "+") {
             shouldGivePredefinedInput = true;
           }
         }
-        if (shouldGivePredefinedInput) {
+        if (shouldGivePredefinedInputArgs) {
           var arg1 = "";
           if(msg.data.length>=4)
           {
@@ -58,13 +61,15 @@ io.on('connection', function(socket) {
           } else {
             io.to("pi-client").emit('chat message', savedInputsNoArgs[contentToSend]);
             }
+        } else if(shouldGivePredefinedInput) {
+          io.to("pi-client").emit('chat message', savedInputs[contentToSend]);
         } else {
           io.to("pi-client").emit('chat message', msg.data);
         }
+      }
       } else {
         io.to(msg.room).emit(msg.type, msg.data)
       }
-    }
   });
 
   socket.on('drawing', (data) => socket.broadcast.emit('drawing', data));
