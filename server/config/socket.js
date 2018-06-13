@@ -3,7 +3,8 @@ const colors = require('colors');
 const ResponseModel = require('../models/response.js');
 
 var savedInputs = ["this will be the first entry", "this wil be the second entry", "this will be the third entry", "Justin got this feature working", "Justin made this function work. Thank him sometime."];
-
+var savedInputsWithArgs = ["Welcome To Class"]
+var savedInputsNoArgs = ["Welcome To Class Everyone!"]
 io.on('connection', function(socket) {
 
   io.emit('chat message', "Use the number's to enter prerecorded text")
@@ -33,20 +34,30 @@ io.on('connection', function(socket) {
   });
 
   socket.on('to room', function(msg) {
-    console.log(msg);
     if (msg.room) {
       if (msg.room == "pi-client" && msg.type == "chat message") {
+        const contentToSend = parseInt(msg.data.split("")[1]) - 1;
         var shouldGivePredefinedInput = false;
+        var hasArgs = false;
+        var isArg = false;
         for (var i = 0; i < savedInputs.length; i++) {
-          if (msg.data == "-" + (
-          i + 1)) {
+          if (msg.data.charAt(0) == "-") {
             shouldGivePredefinedInput = true;
           }
         }
         if (shouldGivePredefinedInput) {
-          const contentToSend = parseInt(msg.data.split("")[1]) - 1;
-          console.log(contentToSend)
-          io.to("pi-client").emit('chat message', savedInputs[contentToSend]);
+          var arg1 = "";
+          if(msg.data.length>=4)
+          {
+           hasArgs = true;
+           arg1 = msg.data.substring(3);
+          }
+          if(hasArgs)
+          {
+            io.to("pi-client").emit('chat message', savedInputsWithArgs[contentToSend] + " " + arg1);
+          } else {
+            io.to("pi-client").emit('chat message', savedInputsNoArgs[contentToSend]);
+            }
         } else {
           io.to("pi-client").emit('chat message', msg.data);
         }
