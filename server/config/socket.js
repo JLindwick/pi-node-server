@@ -2,15 +2,16 @@ var io = require('socket.io')();
 const colors = require('colors');
 const ResponseModel = require('../models/response.js');
 
-var savedInputs = ["this will be the first entry", "this wil be the second entry", "this will be the third entry", "Justin got this feature working", "Justin made this function work. Thank him sometime."];
+var savedInputs = ["this will be the first entry", "this wil be the second entry",
+"this will be the third entry", "Justin got this feature working",
+"Justin made this function work. Thank him sometime."];
 var savedInputsWithArgs = ["Welcome To Class"]
 var savedInputsNoArgs = ["Welcome To Class Everyone!"]
 io.on('connection', function(socket) {
 
   io.emit('chat message', "Use the number's to enter prerecorded text")
-  for (var i = 0; i < savedInputs.length; i++) {
-    io.emit('chat message', (i + 1) + " " + savedInputs[i])
-  }
+  io.emit('chat message', "Use +help or -help to see commands");
+
 
   console.log(socket.conn.id);
   socket.on('chat message', function(data) {
@@ -43,9 +44,33 @@ io.on('connection', function(socket) {
         var isArg = false;
         for (var i = 0; i < savedInputs.length; i++) {
           if (msg.data.charAt(0) == "-") {
+            if(msg.data = "-help") {
+            shouldGivePredefinedInputArgs = false;
+          } else {
             shouldGivePredefinedInputArgs = true;
+            }
           } else if(msg.data.charAt(0) == "+") {
+            if(msg.data = "+help") {
+            shouldGivePredefinedInput = false;
+          } else {
             shouldGivePredefinedInput = true;
+            }
+          }
+        }
+        if (msg.data == "+help")
+        {
+          for(var i = 0;i<savedInputs.length;i++)
+          {
+            io.to("pi-client").emit('chat message', savedInputs[i]);
+          }
+        } else if(msg.data == "-help")
+        {
+          for(var i = 0;i<savedInputsWithArgs.length;i++)
+          {
+            io.to("pi-client").emit('chat message', savedInputsWithArgs[i] + " X");
+            io.to("pi-client").emit('chat message', "[Without Args]");
+            io.to("pi-client").emit('chat message', savedInputsNoArgs[i]);
+
           }
         }
         if (shouldGivePredefinedInputArgs) {
@@ -64,7 +89,13 @@ io.on('connection', function(socket) {
         } else if(shouldGivePredefinedInput) {
           io.to("pi-client").emit('chat message', savedInputs[contentToSend]);
         } else {
-          io.to("pi-client").emit('chat message', msg.data);
+          if (msg.data = "+help" || "-help")
+          {
+            console.log("do nothing");
+          } else {
+            o.to("pi-client").emit('chat message', msg.data);
+          }
+          i
         }
       }
       } else {
