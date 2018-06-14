@@ -91,9 +91,8 @@ io.on('connection', function(socket) {
         } else {
           if (msg.data = "+help" || "-help")
           {
-            console.log("do nothing");
           } else {
-            o.to("pi-client").emit('chat message', msg.data);
+            io.to("pi-client").emit('chat message', msg.data);
           }
           i
         }
