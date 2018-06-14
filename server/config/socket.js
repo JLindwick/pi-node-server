@@ -61,15 +61,15 @@ io.on('connection', function(socket) {
         {
           for(var i = 0;i<savedInputs.length;i++)
           {
-            io.to("pi-client").emit('chat message', savedInputs[i]);
+            io.to("pi-client").emit('chat message', "command: +" + i + " [" + savedInputs[i] + "]");
           }
         } else if(msg.data == "-help")
         {
           for(var i = 0;i<savedInputsWithArgs.length;i++)
           {
-            io.to("pi-client").emit('chat message', savedInputsWithArgs[i] + " X");
+            io.to("pi-client").emit('chat message', "command: -" + i + " [" + savedInputsWithArgs[i] + " X]");
             io.to("pi-client").emit('chat message', "[Without Args]");
-            io.to("pi-client").emit('chat message', savedInputsNoArgs[i]);
+            io.to("pi-client").emit('chat message', "command: -" + i + " [" + savedInputsNoArgs[i] + "]");
 
           }
         }
@@ -91,6 +91,7 @@ io.on('connection', function(socket) {
         } else {
           if (msg.data = "+help" || "-help")
           {
+            // do nothing
           } else {
             io.to("pi-client").emit('chat message', msg.data);
           }
